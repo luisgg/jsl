@@ -1,18 +1,21 @@
 #!/usr/bin/make -f
 
 #export DH_VERBOSE=1
+#CFLAGS = $(shell DEB_BUILD_MAINT_OPTIONS=hardening=-stackprotector dpkg-buildflags --get CFLAGS)
+#CXXFLAGS = $(shell DEB_BUILD_MAINT_OPTIONS=hardening=-stackprotector dpkg-buildflags --get CXXFLAGS)
 
 clean:
 	dh_testdir
 	dh_testroot
-	find . -maxdepth 1 -not -iname "debian" -not -name ".*" -exec rm -r -v '{}' \;
+	# find . -maxdepth 1 -not -iname "debian" -not -name ".*" -not -name "DATA" -exec rm -r -v '{}' \;
+	rm -fr $(CURDIR)/jsl-0.3.0
 	dh_clean
 
 extract: extract-stamp
 extract-stamp:
-	tar -xzvf $(CURDIR)/../sources/jsl-0.3.0-src.tar.gz
-	mv $(CURDIR)/jsl-0.3.0/* $(CURDIR)
-	rm -rf $(CURDIR)/jsl-0.3.0
+	tar -xzvf /usr/share/omv-extra-sources/sources/jsl-0.3.0-src.tar.gz
+	# mv $(CURDIR)/jsl-0.3.0/* $(CURDIR)
+	# rm -rf $(CURDIR)/jsl-0.3.0
 	touch extract-stamp
 
 configure: configure-stamp
@@ -23,7 +26,7 @@ configure-stamp:
 build: extract configure build-stamp
 build-stamp:
 	dh_testdir
-	$(MAKE) -C src -f Makefile.ref
+	$(MAKE) -C jsl-0.3.0/src -f Makefile.ref
 	touch build-stamp
 
 install: build
@@ -40,6 +43,7 @@ binary-arch: install
 	dh_testroot
 	dh_install
 	dh_installchangelogs
+	dh_installdocs
 	dh_installdebconf
 	dh_lintian
 	dh_compress
